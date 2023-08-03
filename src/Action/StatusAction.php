@@ -42,7 +42,7 @@ class StatusAction implements ActionInterface, ApiAwareInterface
 
         $transaction = $this->api->getApi()->getOne($model['pfc_transaction_id']);
         $status = $transaction->getStatus();
-
+//        TODO Miguel: Switch for all available status
         switch ($status) {
             case Transaction::CONFIRMED:
                 if ($request instanceof GetHumanStatus) {

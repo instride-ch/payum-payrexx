@@ -19,6 +19,7 @@
   "require": {
     "php": ">=7.4",
     "payum/core": "^1.7",
+    "php-http/guzzle6-adapter": "^2.0",
     "payrexx/payrexx": "^1.8"
   },
   "autoload": {

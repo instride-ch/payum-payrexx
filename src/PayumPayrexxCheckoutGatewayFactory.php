@@ -18,8 +18,8 @@ class PayumPayrexxCheckoutGatewayFactory extends GatewayFactory
     protected function populateConfig(ArrayObject $config): void
     {
         $config->defaults([
-            'payum.factory_name' => 'payrexx',
-            'payum.factory_title' => 'Payrexx',
+            'payum.factory_name' => 'payrexx_checkout',
+            'payum.factory_title' => 'Payrexx Checkout',
             'payum.action.capture' => new CaptureOffSiteAction(),
             'payum.action.status' => new StatusAction(),
             'payum.action.convert_payment' => new ConvertPaymentAction(),
