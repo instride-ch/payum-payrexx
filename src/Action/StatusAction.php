@@ -4,83 +4,30 @@ declare(strict_types=1);
 
 namespace Wvision\Payum\Payrexx\Action;
 
-use Payrexx\Models\Response\Transaction;
-use Payrexx\Payrexx;
 use Payum\Core\Action\ActionInterface;
-use Payum\Core\ApiAwareInterface;
-use Payum\Core\ApiAwareTrait;
-use Payum\Core\Bridge\Spl\ArrayObject;
-use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Request\GetStatusInterface;
-use Wvision\Payum\Payrexx\Request\GetHumanStatus;
 
-class StatusAction implements ActionInterface, ApiAwareInterface
+class StatusAction implements ActionInterface
 {
-    use ApiAwareTrait;
-
-    public function __construct()
-    {
-        $this->apiClass = Payrexx::class;
-    }
-
     /**
-     * @inheritDoc
-     *
-     * @param GetHumanStatus $request
+     * @param GetStatusInterface $request
      */
-    public function execute($request): void
+    public function execute($request)
     {
-        RequestNotSupportedException::assertSupports($this, $request);
+        $model = $request->getModel();
 
-        $model = new ArrayObject($request->getModel());
-
-        if (null === $model['pfc_transaction_id']) {
+        if (empty($model)) {
             $request->markNew();
-
-            return;
         }
 
-        $transaction = $this->api->getApi()->getOne($model['pfc_transaction_id']);
-        $status = $transaction->getStatus();
-//        TODO Miguel: Switch for all available status
-        switch ($status) {
-            case Transaction::CONFIRMED:
-                if ($request instanceof GetHumanStatus) {
-                    $request->markConfirmed();
-                }
-
-                break;
-//            case Transaction::COMPLETED:
-//            case Transaction::FULFILL:
-//                $request->markCaptured();
-//
-//                break;
-            case Transaction::WAITING:
-                $request->markPending();
-
-                break;
-            case Transaction::AUTHORIZED:
-                $request->markAuthorized();
-
-                break;
-//            case Transaction::DECLINE:
-//            case Transaction::FAILED:
-//                $request->markFailed();
-//
-//                break;
-            default:
-                $request->markUnknown();
-
-                break;
+        if ($model['status'] == 'confirmed') {
+            $request->markCaptured();
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function supports($request): bool
+    public function supports($request)
     {
-        return $request instanceof GetStatusInterface
-            && $request->getModel() instanceof \ArrayAccess;
+        return $request instanceof GetStatusInterface &&
+            $request->getModel() instanceof \ArrayAccess;
     }
 }
