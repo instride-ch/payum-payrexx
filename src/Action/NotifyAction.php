@@ -31,7 +31,6 @@ class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
      */
     public function execute($request): void
     {
-        dd('notifyAction');
         RequestNotSupportedException::assertSupports($this, $request);
 
         $this->gateway->execute(new GetHumanStatus($request));

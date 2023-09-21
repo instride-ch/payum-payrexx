@@ -31,7 +31,6 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
      */
     public function execute($request): void
     {
-        dd('nice');
         RequestNotSupportedException::assertSupports($this, $request);
 
         $this->gateway->execute(new GetHumanStatus($request));
