@@ -7,12 +7,11 @@ namespace Wvision\Payum\Payrexx\Action;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
-use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
+use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\Notify;
 use Wvision\Payum\Payrexx\Api;
-use Wvision\Payum\Payrexx\Request\GetHumanStatus;
 
 class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
@@ -31,9 +30,7 @@ class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
      */
     public function execute($request): void
     {
-        RequestNotSupportedException::assertSupports($this, $request);
-
-        $this->gateway->execute(new GetHumanStatus($request));
+        throw new HttpResponse('OK', 200, ['Content-Type' => 'text/plain', 'X-Notify-Message' => 'NO_TOKEN_HASH_FOUND']);
     }
 
     /**

@@ -28,10 +28,8 @@ class StatusAction implements ActionInterface, ApiAwareInterface
         $model = $request->getModel();
         if (empty($model)) {
             $request->markNew();
+            return;
         }
-//        if ($request instanceof GetHumanStatus) {
-//            dd($model['status']);
-//        }
 
         switch ($model['status']) {
             case GetHumanStatus::STATUS_CONFIRMED:
