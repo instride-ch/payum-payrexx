@@ -32,7 +32,6 @@ class CaptureOffsiteAction implements ActionInterface, GatewayAwareInterface, Ap
     public function execute($request)
     {
         RequestNotSupportedException::assertSupports($this, $request);
-        dd('test');
         throw new HttpRedirect(
             $this->api->getAfterLink()
         );

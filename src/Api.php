@@ -33,38 +33,35 @@ class Api
         $this->instance = $instance;
     }
 
-    public function createTransaction(CreateTransaction $request, string $returnUrl, string $tokenHash): array
+    public function createTransaction(CreateTransaction $request, string $returnUrl, string $tokenHash): \Payrexx\Models\Base
     {
         $model = $request->getFirstModel();
         $payrexx = new \Payrexx\Payrexx($this->instance, $this->apiKey);
 
-        $transaction = new \Payrexx\Models\Request\Transaction();
-
-        $basket = [];
+        $gateway = new \Payrexx\Models\Request\Gateway();
         $transactionExtender = [];
         if ($model->offsetExists('transaction_extender')) {
             $transactionExtender = $model['transaction_extender'];
         }
 
-        $transaction->setCurrency($model->getCurrencyCode());
-        $transaction->setVatRate(7.70);
-        $transaction->setAmount($model->getTotalAmount());
-
-        $transaction->addField($type = 'paymentToken', $value = $tokenHash);
-        $transaction->addField($type = 'title', $value = 'mister');
-        $transaction->addField($type = 'forename', $value = 'Max');
-        $transaction->addField($type = 'surname', $value = 'Mustermann');
-        $transaction->addField($type = 'company', $value = 'Max Musterfirma');
-        $transaction->addField($type = 'street', $value = 'Musterweg 1');
-        $transaction->addField($type = 'postcode', $value = '1234');
-        $transaction->addField($type = 'place', $value = 'Musterort');
-        $transaction->addField($type = 'country', $value = 'AT');
-        $transaction->addField($type = 'phone', $value = '+43123456789');
-        $transaction->addField($type = 'email', $value = 'max.muster@payrexx.com');
-        $response = $payrexx->create($transaction);
-        dd($response);
+        $gateway->setCurrency($transactionExtender['currency']);
+        $gateway->setVatRate(7.70);
+        $gateway->setAmount($transactionExtender['amount']);
+        $gateway->setSuccessRedirectUrl($returnUrl);
+        $gateway->addField($type = 'paymentToken', $value = $tokenHash);
+        $gateway->addField($type = 'title', $value = 'mister');
+        $gateway->addField($type = 'forename', $value = 'Max');
+        $gateway->addField($type = 'surname', $value = 'Mustermann');
+        $gateway->addField($type = 'company', $value = 'Max Musterfirma');
+        $gateway->addField($type = 'street', $value = 'Musterweg 1');
+        $gateway->addField($type = 'postcode', $value = '1234');
+        $gateway->addField($type = 'place', $value = 'Musterort');
+        $gateway->addField($type = 'country', $value = 'AT');
+        $gateway->addField($type = 'phone', $value = '+43123456789');
+        $gateway->addField($type = 'email', $value = 'max.muster@payrexx.com');
+        $response = $payrexx->create($gateway);
         $this->setAfterLink($response->getLink());
-        return ['status' => 'confirmed'];
+        return $response;
     }
 
     public function getApi(): Payrexx

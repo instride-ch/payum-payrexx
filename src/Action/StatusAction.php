@@ -32,7 +32,9 @@ class StatusAction implements ActionInterface, ApiAwareInterface
 
             return;
         }
-        $transaction = $this->api->getApi()->getOne(($model['transaction_id']));
+        $transaction = new \Payrexx\Models\Request\Transaction();
+        $transaction->setId(($model['transaction_id']));
+        $transaction = $this->api->getApi()->getOne($transaction);
         if (!$transaction instanceof Transaction) {
             $request->markUnknown();
 

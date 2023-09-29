@@ -32,13 +32,11 @@ class CreateTransactionAction implements ActionInterface, GatewayAwareInterface,
         RequestNotSupportedException::assertSupports($this, $request);
         $model = ArrayObject::ensureArrayObject($request->getModel());
         try {
-            $returnUrl = $request->getToken()->getTargetUrl();
+            $returnUrl = $request->getToken()->getAfterUrl();
             $tokenHash = $request->getToken()->getHash();
 
             /** @var Transaction $transaction */
-            dd('test');
             $transaction = $this->api->createTransaction($request, $returnUrl, $tokenHash);
-            dd($transaction);
 
             $model->replace(['transaction_id' => $transaction->getId()]);
 

@@ -14,7 +14,7 @@ namespace Wvision\Payum\Payrexx\Transaction;
 
 class Transaction
 {
-    protected mixed $id;
+    protected string $id;
     protected float $amount;
     protected ?string $currency;
     protected ?string $language = null;
@@ -68,9 +68,9 @@ class Transaction
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getId()
+    public function getId() :string
     {
         return $this->id;
     }
