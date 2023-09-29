@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Wvision\Payum\Payrexx\Action;
 
+use Payrexx\Models\Request\Transaction;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
@@ -26,12 +27,21 @@ class StatusAction implements ActionInterface, ApiAwareInterface
     public function execute($request)
     {
         $model = $request->getModel();
-        if (empty($model)) {
+        if ($model['transaction_id'] === null) {
             $request->markNew();
+
             return;
         }
+        $transaction = $this->api->getApi()->getOne(($model['transaction_id']));
+        if (!$transaction instanceof Transaction) {
+            $request->markUnknown();
 
-        switch ($model['status']) {
+            return;
+        }
+        dd($transaction);
+        $state = $transaction->getResponseModel()->getStatus();
+
+        switch ($state) {
             case GetHumanStatus::STATUS_CONFIRMED:
                 if ($request instanceof GetHumanStatus) {
                     $request->markConfirmed();

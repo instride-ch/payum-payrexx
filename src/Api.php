@@ -12,7 +12,10 @@
 
 namespace Wvision\Payum\Payrexx;
 
+use Payrexx\Models\Request\Transaction;
 use Payrexx\Payrexx;
+use Payum\Core\Model\ArrayObject;
+use Wvision\Payum\Payrexx\Request\Api\CreateTransaction;
 
 class Api
 {
@@ -30,39 +33,36 @@ class Api
         $this->instance = $instance;
     }
 
-    public function executePayment($request): array
+    public function createTransaction(CreateTransaction $request, string $returnUrl, string $tokenHash): array
     {
         $model = $request->getFirstModel();
         $payrexx = new \Payrexx\Payrexx($this->instance, $this->apiKey);
-        $gateway = new \Payrexx\Models\Request\Gateway();
+
+        $transaction = new \Payrexx\Models\Request\Transaction();
+
         $basket = [];
-
-        foreach ($model->getOrder()->getItems() as $orderItem) {
-            $basket[] = [
-                'name' => $orderItem->getProduct()->getName(),
-                'description' => $orderItem->getProduct()->getDescription(),
-                'quantity' => count($orderItem->getParticipants()),
-                'amount' => $orderItem->getBaseItemPriceGross(),
-            ];
+        $transactionExtender = [];
+        if ($model->offsetExists('transaction_extender')) {
+            $transactionExtender = $model['transaction_extender'];
         }
-        $gateway->setCurrency($model->getCurrencyCode());
-        $gateway->setBasket($basket);
-        $gateway->setVatRate(7.70);
-        $gateway->setAmount($model->getTotalAmount());
-        $gateway->setSuccessRedirectUrl($request->getToken()->getAfterUrl());
 
-        $gateway->addField($type = 'title', $value = 'mister');
-        $gateway->addField($type = 'forename', $value = 'Max');
-        $gateway->addField($type = 'surname', $value = 'Mustermann');
-        $gateway->addField($type = 'company', $value = 'Max Musterfirma');
-        $gateway->addField($type = 'street', $value = 'Musterweg 1');
-        $gateway->addField($type = 'postcode', $value = '1234');
-        $gateway->addField($type = 'place', $value = 'Musterort');
-        $gateway->addField($type = 'country', $value = 'AT');
-        $gateway->addField($type = 'phone', $value = '+43123456789');
-        $gateway->addField($type = 'email', $value = 'max.muster@payrexx.com');
-        $response = $payrexx->create($gateway);
+        $transaction->setCurrency($model->getCurrencyCode());
+        $transaction->setVatRate(7.70);
+        $transaction->setAmount($model->getTotalAmount());
 
+        $transaction->addField($type = 'paymentToken', $value = $tokenHash);
+        $transaction->addField($type = 'title', $value = 'mister');
+        $transaction->addField($type = 'forename', $value = 'Max');
+        $transaction->addField($type = 'surname', $value = 'Mustermann');
+        $transaction->addField($type = 'company', $value = 'Max Musterfirma');
+        $transaction->addField($type = 'street', $value = 'Musterweg 1');
+        $transaction->addField($type = 'postcode', $value = '1234');
+        $transaction->addField($type = 'place', $value = 'Musterort');
+        $transaction->addField($type = 'country', $value = 'AT');
+        $transaction->addField($type = 'phone', $value = '+43123456789');
+        $transaction->addField($type = 'email', $value = 'max.muster@payrexx.com');
+        $response = $payrexx->create($transaction);
+        dd($response);
         $this->setAfterLink($response->getLink());
         return ['status' => 'confirmed'];
     }
@@ -70,6 +70,48 @@ class Api
     public function getApi(): Payrexx
     {
         return $this->api;
+    }
+
+    public function createTransactionInfo(Transaction $transaction): array
+    {
+        $data = [];
+
+        $ref = new \ReflectionClass($transaction);
+
+        $invalidNames = [
+            'getters'
+        ];
+
+        foreach ($ref->getMethods() as $method) {
+
+            $methodName = $method->getName();
+
+            if (!$method->isPublic()) {
+                continue;
+            }
+
+            if (in_array($methodName, $invalidNames, true)) {
+                continue;
+            }
+
+            if (!str_starts_with($methodName, 'get')) {
+                continue;
+            }
+
+            $value = $transaction->$methodName();
+
+            if ($value === null) {
+                continue;
+            }
+
+            if (is_object($value)) {
+                continue;
+            }
+
+            $data[str_replace('get', '', $methodName)] = $value;
+        }
+
+        return $data;
     }
 
     /**

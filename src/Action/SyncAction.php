@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace Wvision\Payum\Payrexx\Action;
 
+use Payrexx\Models\Request\Transaction;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
+use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
-use Payum\Core\Reply\HttpResponse;
-use Payum\Core\Request\Notify;
 use Payum\Core\Request\Sync;
-use Payum\Core\Bridge\Spl\ArrayObject;
 use Wvision\Payum\Payrexx\Api;
 
-class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
+class SyncAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
-    use ApiAwareTrait;
     use GatewayAwareTrait;
+    use ApiAwareTrait;
 
     public function __construct()
     {
@@ -27,27 +26,30 @@ class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
     }
 
     /**
-     * @inheritDoc
-     *
-     * @param Notify $request
+     * @param Sync $request
      */
-    public function execute($request): void
+    public function execute($request)
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        $this->gateway->execute(new Sync($model));
+        if ($model['transaction_id'] === null) {
+            return;
+        }
 
-        throw new HttpResponse('OK', 200, ['Content-Type' => 'text/plain']);
+        $transaction = $this->api->getApi()->getOne(($model['transaction_id']));
+        if (!$transaction instanceof Transaction) {
+            return;
+        }
+
+        $model->replace($this->api->createTransactionInfo($transaction));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supports($request): bool
     {
-        return $request instanceof Notify
-            && $request->getModel() instanceof \ArrayAccess;
+        return
+            $request instanceof Sync &&
+            $request->getModel() instanceof \ArrayAccess;
     }
 }
