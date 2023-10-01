@@ -15,6 +15,7 @@ use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Sync;
 use Wvision\Payum\Payrexx\Api;
 
+
 class SyncAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
     use GatewayAwareTrait;
@@ -32,24 +33,54 @@ class SyncAction implements ActionInterface, ApiAwareInterface, GatewayAwareInte
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        $model = ArrayObject::ensureArrayObject($request->getModel());
+        $this->wh_log('sync action');
 
-        if ($model['transaction_id'] === null) {
+        $model = $request->getModel();
+
+        if ($model['gateway_id'] === null) {
             return;
         }
 
-        $transaction = $this->api->getApi()->getOne(($model['transaction_id']));
+        $this->wh_log(json_encode($request->getFirstModel()). ' decode Firstmodel');
+        $this->wh_log(json_encode($request->getModel()). ' decode model');
+//        $this->wh_log($model['transaction_id'].' - transaction id model');
+//        $this->wh_log($request->getFirstModel()['transaction_id'].' - transaction id firstmodel');
+
+        $transaction = new Transaction();
+        $transaction->setOffset(100);
+        $transaction->setLimit(30);
+        try {
+            $transaction = $this->api->getApi()->getAll($transaction);
+            $this->wh_log(json_decode($transaction). '  decoded transaction');
+
+        } catch (\Payrexx\PayrexxException $e) {
+            $this->wh_log($e->getMessage().' @Line ->'.$e->getLine().' |SyncAction');
+        }
+
         if (!$transaction instanceof Transaction) {
+            $this->wh_log('transaction not Transaction');
             return;
         }
+        $this->wh_log('transaction found!');
 
         $model->replace($this->api->createTransactionInfo($transaction));
     }
 
+    private function wh_log($log_msg)
+    {
+        $log_filename = $_SERVER['DOCUMENT_ROOT'] . "/log_test";
+        if (!file_exists($log_filename)) {
+            // create directory/folder uploads.
+            mkdir($log_filename, 0777, true);
+        }
+        $log_file_data = $log_filename . '/log_' . date('d-M-Y:h:i:s') . '.log';
+        file_put_contents($log_file_data, $log_msg . "\n", FILE_APPEND);
+    }
+
     public function supports($request): bool
     {
+        $this->wh_log('sync action supports '.get_class($request));
         return
-            $request instanceof Sync &&
-            $request->getModel() instanceof \ArrayAccess;
+            $request instanceof Sync;
     }
 }

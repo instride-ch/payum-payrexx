@@ -16,6 +16,7 @@ use Payrexx\Models\Request\Transaction;
 use Payrexx\Payrexx;
 use Payum\Core\Model\ArrayObject;
 use Wvision\Payum\Payrexx\Request\Api\CreateTransaction;
+use Wvision\Payum\Payrexx\Request\GetHumanStatus;
 
 class Api
 {
@@ -48,7 +49,6 @@ class Api
         $gateway->setVatRate(7.70);
         $gateway->setAmount($transactionExtender['amount']);
         $gateway->setSuccessRedirectUrl($returnUrl);
-        $gateway->addField($type = 'paymentToken', $value = $tokenHash);
         $gateway->addField($type = 'title', $value = 'mister');
         $gateway->addField($type = 'forename', $value = 'Max');
         $gateway->addField($type = 'surname', $value = 'Mustermann');
@@ -59,9 +59,60 @@ class Api
         $gateway->addField($type = 'country', $value = 'AT');
         $gateway->addField($type = 'phone', $value = '+43123456789');
         $gateway->addField($type = 'email', $value = 'max.muster@payrexx.com');
+        $gateway->addField($type = 'custom_field_1', $value = $tokenHash, $name = array(
+            1 => 'Zahlungs Token (DE)',
+            2 => 'Payment Token (EN)',
+            3 => 'Token (FR)',
+            4 => 'Token (IT)',
+        ));
+
         $response = $payrexx->create($gateway);
         $this->setAfterLink($response->getLink());
         return $response;
+    }
+
+    public function getTransactionByGateway($payrexxGateway): ?\Payrexx\Models\Response\Transaction
+    {
+        if (!in_array($payrexxGateway->getStatus(), [GetHumanStatus::STATUS_CONFIRMED, GetHumanStatus::STATUS_WAITING])) {
+            return null;
+        }
+        $invoices = $payrexxGateway->getInvoices();
+
+        if (!$invoices || !$invoice = end($invoices)) {
+            return null;
+        }
+
+        if (!$transactions = $invoice['transactions']) {
+            return null;
+        }
+
+        return $this->getPayrexxTransaction(end($transactions)['id']);
+    }
+
+    public function getPayrexxTransaction(int $payrexxTransactionId): ?\Payrexx\Models\Response\Transaction
+    {
+        $payrexxTransaction = new \Payrexx\Models\Request\Transaction();
+        $payrexxTransaction->setId($payrexxTransactionId);
+
+        try {
+            $response = $this->getApi()->getOne($payrexxTransaction);
+            return $response;
+        } catch(\Payrexx\PayrexxException $e) {
+            return null;
+        }
+    }
+
+    public function getPayrexxGateway(int $payrexxGatewayId): ?\Payrexx\Models\Response\Gateway
+    {
+        $payrexxGateway = new \Payrexx\Models\Request\Gateway();
+        $payrexxGateway->setId($payrexxGatewayId);
+
+        try {
+            $response = $this->getApi()->getOne($payrexxGateway);
+            return $response;
+        } catch(\Payrexx\PayrexxException $e) {
+            return null;
+        }
     }
 
     public function getApi(): Payrexx

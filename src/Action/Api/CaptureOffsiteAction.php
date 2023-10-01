@@ -46,7 +46,6 @@ class CaptureOffsiteAction implements ActionInterface, GatewayAwareInterface, Ap
         if (!$request->getModel() instanceof \ArrayAccess) {
             return false;
         }
-
-        return array_key_exists('transaction_id', ArrayObject::ensureArrayObject($request->getModel())->toUnsafeArray());
+        return array_key_exists('gateway_id', ArrayObject::ensureArrayObject($request->getModel())->toUnsafeArray());
     }
 }
