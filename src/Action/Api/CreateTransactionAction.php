@@ -35,11 +35,9 @@ class CreateTransactionAction implements ActionInterface, GatewayAwareInterface,
             $returnUrl = $request->getToken()->getAfterUrl();
             $tokenHash = $request->getToken()->getHash();
 
-            /** @var Transaction $transaction */
-            $transaction = $this->api->createTransaction($request, $returnUrl, $tokenHash);
-
-            $model->replace(['transaction_id' => $transaction->getId()]);
-
+            /** @var Transaction $gateway */
+            $gateway = $this->api->createTransaction($request, $returnUrl, $tokenHash);
+            $model->replace(['gateway_id' => $gateway->getId()]);
         } catch (\Throwable $e) {
             $model->replace(['error_message' => $e->getMessage(), 'failed' => true]);
         }

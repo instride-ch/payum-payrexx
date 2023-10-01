@@ -6,7 +6,6 @@ namespace Wvision\Payum\Payrexx\Action;
 
 use Payrexx\Models\Request\Transaction;
 use Wvision\Payum\Payrexx\Api;
-use Exception;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
@@ -17,7 +16,6 @@ use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\Base;
 use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\GetHttpRequest;
-use Payum\Core\Request\GetToken;
 use Payum\Core\Request\Notify;
 
 class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
@@ -41,8 +39,6 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
         file_put_contents($log_file_data, $log_msg . "\n", FILE_APPEND);
     }
 
-
-
     /**
      * @inheritDoc
      *
@@ -63,42 +59,40 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
             }
 
             $transaction = new \Payrexx\Models\Request\Transaction();
+
             $id = $parsedBody['transaction']['id'];
             $transaction->setId($id);
-
             try {
                 $transaction = $this->api->getApi()->getOne($transaction);
             } catch (\Payrexx\PayrexxException $e) {
-                $this->wh_log($e->getReason().' @Line ->'.$e->getLine());
+                $this->wh_log($e->getMessage().' @Line1 ->'.$e->getLine());
             }
 
             if (!$transaction instanceof Transaction) {
                 return;
             }
-
-            // TODO Method getMetaData Missing
-            // $tokenHash = $transaction->getMetaData()['paymentToken'] ?? null;
-            $tokenHash = null;
+            $tokenHash = $parsedBody['transaction']['invoice']['paymentLink']['hash'] ?? null;
 
         } catch (\Throwable $e) {
-            $this->wh_log($e->getMessage().' @Line ->'.$e->getLine());
+            $this->wh_log($e->getMessage().' @Line2 ->'.$e->getLine());
 
             throw new HttpResponse($e->getMessage(), 500, ['Content-Type' => 'text/plain', 'X-Notify-Message' => $e->getMessage()]);
         }
-        $this->wh_log('start');
-
 
         if ($tokenHash === null) {
             throw new HttpResponse('OK', 200, ['Content-Type' => 'text/plain', 'X-Notify-Message' => 'NO_TOKEN_HASH_FOUND']);
         }
 
         try {
-            $this->gateway->execute($getToken = new GetToken($tokenHash));
-        } catch (\Throwable $e) {
-            throw new HttpResponse('OK', 200, ['Content-Type' => 'text/plain', 'X-Notify-Message' => 'ALREADY_CLEARED_OUT']);
+            $this->gateway->execute(new Notify($tokenHash));
+        } catch (Base $e) {
+            $this->wh_log('End Notify Null '.$e->getMessage().' @Line - '.$e->getLine());
+//            throw $e;
+        } catch (LogicException $e) {
+            $this->wh_log('End Notify Null '.$e->getMessage().' @Line - '.$e->getLine());
+//            throw new HttpResponse($e->getMessage(), 400, ['Content-Type' => 'text/plain']);
         }
-
-        $this->gateway->execute(new Notify($getToken->getToken()));    }
+    }
 
     /**
      * @inheritDoc

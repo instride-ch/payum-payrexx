@@ -9,14 +9,19 @@ use Payum\Core\Request\GetHumanStatus as BaseGetHumanStatus;
 class GetHumanStatus extends BaseGetHumanStatus
 {
     public const STATUS_CONFIRMED = 'confirmed';
+    public const STATUS_WAITING = 'waiting';
 
     public function markConfirmed(): void
     {
         $this->status = static::STATUS_CONFIRMED;
     }
-
-    public function isConfirmed(): bool
+    public function markWaiting(): void
     {
-        return $this->isCurrentStatusEqualTo(static::STATUS_CONFIRMED);
+        $this->status = static::STATUS_WAITING;
+    }
+
+    public function isWaiting(): bool
+    {
+        return $this->isCurrentStatusEqualTo(static::STATUS_WAITING);
     }
 }
