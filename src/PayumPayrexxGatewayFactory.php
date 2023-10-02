@@ -15,18 +15,16 @@ declare(strict_types=1);
 
 namespace Wvision\Payum\Payrexx;
 
-use Payum\Core\Bridge\Spl\ArrayObject;
 use Payrexx\Payrexx;
+use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\GatewayFactory;
 use Wvision\Payum\Payrexx\Action\Api\CaptureOffsiteAction;
 use Wvision\Payum\Payrexx\Action\Api\CreateTransactionAction;
-use Wvision\Payum\Payrexx\Action\Api\TransactionExtenderAction;
 use Wvision\Payum\Payrexx\Action\CaptureAction;
 use Wvision\Payum\Payrexx\Action\ConvertPaymentAction;
 use Wvision\Payum\Payrexx\Action\NotifyAction;
 use Wvision\Payum\Payrexx\Action\NotifyNullAction;
 use Wvision\Payum\Payrexx\Action\StatusAction;
-use Wvision\Payum\Payrexx\Action\SyncAction;
 
 class PayumPayrexxGatewayFactory extends GatewayFactory
 {
@@ -42,7 +40,6 @@ class PayumPayrexxGatewayFactory extends GatewayFactory
             'payum.action.notify'          => new NotifyAction(),
             'payum.action.convert_payment' => new ConvertPaymentAction(),
 
-            'payum.action.api.transaction_extender'   => new TransactionExtenderAction(),
             'payum.action.api.initialize_transaction' => new CreateTransactionAction(),
             'payum.action.api.capture_offsite'        => new CaptureOffsiteAction(),
         ]);
