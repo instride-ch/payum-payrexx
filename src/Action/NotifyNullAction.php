@@ -16,7 +16,7 @@ use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\Base;
 use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\GetHttpRequest;
-use Payum\Core\Request\Notify;
+use Wvision\Payum\Payrexx\Request\Notify;
 
 class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
@@ -46,7 +46,6 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
      */
     public function execute($request): void
     {
-
         RequestNotSupportedException::assertSupports($this, $request);
 
         $this->gateway->execute($httpRequest = new GetHttpRequest());
@@ -84,7 +83,7 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
         }
 
         try {
-            $this->gateway->execute(new Notify($tokenHash));
+            $this->gateway->execute(new Notify($tokenHash, $transaction));
         } catch (Base $e) {
             $this->wh_log('End Notify Null '.$e->getMessage().' @Line - '.$e->getLine());
 //            throw $e;

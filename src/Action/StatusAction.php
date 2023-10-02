@@ -8,6 +8,7 @@ use Payrexx\Models\Request\Transaction;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
+use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Request\GetStatusInterface;
 use Wvision\Payum\Payrexx\Api;
 use Wvision\Payum\Payrexx\Request\GetHumanStatus;
@@ -37,46 +38,59 @@ class StatusAction implements ActionInterface, ApiAwareInterface
      */
     public function execute($request)
     {
-        $this->wh_log('status Action');
-        $model = $request->getModel();
-        if ($model['gateway_id'] === null) {
-            $request->markNew();
+        $this->wh_log('status Action model start');
+        RequestNotSupportedException::assertSupports($this, $request);
+        try {
+            $model = $request->getModel();
+            $this->wh_log('status Action model - asserts -');
 
+        } catch (\Exception $e) {
+            $this->wh_log($e->getMessage().' '. $e->getLine());
+        }
+
+        if ($request instanceof GetHumanStatus) {
+            $transaction = $request->getTransaction();
+        }
+
+        if (array_key_exists('gateway_id', $model) ) {
+            if ($model['gateway_id'] === null) {
+                $request->markNew();
+                return;
+            }
+        } else {
+            $this->wh_log('No Gateway Id given');
+            $request->markNew();
             return;
         }
 
-        //       $transaction->setId(($model['transaction_id']));
+        $this->wh_log('Expected ');
+        $this->wh_log($model['gateway_id']);
+
         $gateway = $this->api->getPayrexxGateway($model['gateway_id']);
         $transaction = $this->api->getTransactionByGateway($gateway);
+
+        $this->wh_log('Transaction -> ' . get_class($transaction));
         if (!$transaction instanceof Transaction) {
             $request->markUnknown();
 
             return;
         }
         $state = $transaction->getStatus();
-
+        $this->wh_log($state);
         switch ($state) {
-            case GetHumanStatus::STATUS_CONFIRMED:
-                if ($request instanceof GetHumanStatus) {
-                    $request->markConfirmed();
-                }
-                break;
-            case GetHumanStatus::STATUS_WAITING:
-                if ($request instanceof GetHumanStatus) {
-                    $request->markWaiting();
-                }
-                break;
             case GetHumanStatus::STATUS_CAPTURED:
+            case GetHumanStatus::STATUS_CONFIRMED:
                 $request->markCaptured();
                 break;
+            case GetHumanStatus::STATUS_PENDING:
+            case GetHumanStatus::STATUS_WAITING:
+                $request->markPending();
+            break;
             case GetHumanStatus::STATUS_FAILED:
                 $request->markFailed();
                 break;
             case GetHumanStatus::STATUS_AUTHORIZED:
                 $request->markAuthorized();
-                break;
-            case GetHumanStatus::STATUS_PENDING:
-                $request->markPending();
                 break;
             case GetHumanStatus::STATUS_PAYEDOUT:
                 $request->markPayedout();
@@ -89,9 +103,8 @@ class StatusAction implements ActionInterface, ApiAwareInterface
 
     public function supports($request)
     {
-        $this->wh_log('status Action supports? - '.get_class($request));
+        $this->wh_log('status Action supports? - ' . get_class($request));
 
-        return $request instanceof GetStatusInterface &&
-            $request->getModel() instanceof \ArrayAccess;
+        return $request instanceof GetStatusInterface;
     }
 }

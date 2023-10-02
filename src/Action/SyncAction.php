@@ -41,21 +41,12 @@ class SyncAction implements ActionInterface, ApiAwareInterface, GatewayAwareInte
             return;
         }
 
-        $this->wh_log(json_encode($request->getFirstModel()). ' decode Firstmodel');
-        $this->wh_log(json_encode($request->getModel()). ' decode model');
-//        $this->wh_log($model['transaction_id'].' - transaction id model');
-//        $this->wh_log($request->getFirstModel()['transaction_id'].' - transaction id firstmodel');
+        $this->wh_log(json_decode($model).' - gateway model');
+//        $this->wh_log($model['gateway_id'].' - gateway id model');
+//        $this->wh_log($request->getFirstModel()['gateway_id'].' - gateway id firstmodel');
 
-        $transaction = new Transaction();
-        $transaction->setOffset(100);
-        $transaction->setLimit(30);
-        try {
-            $transaction = $this->api->getApi()->getAll($transaction);
-            $this->wh_log(json_decode($transaction). '  decoded transaction');
-
-        } catch (\Payrexx\PayrexxException $e) {
-            $this->wh_log($e->getMessage().' @Line ->'.$e->getLine().' |SyncAction');
-        }
+        $gateway = $this->api->getPayrexxGateway($model['gateway_id']);
+        $transaction = $this->api->getTransactionByGateway($gateway);
 
         if (!$transaction instanceof Transaction) {
             $this->wh_log('transaction not Transaction');
