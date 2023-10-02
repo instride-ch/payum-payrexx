@@ -1,4 +1,5 @@
 <?php
+
 /**
  * w-vision.
  *
@@ -12,9 +13,7 @@
 
 namespace Wvision\Payum\Payrexx;
 
-use Payrexx\Models\Request\Transaction;
 use Payrexx\Payrexx;
-use Payum\Core\Model\ArrayObject;
 use Wvision\Payum\Payrexx\Request\Api\CreateTransaction;
 use Wvision\Payum\Payrexx\Request\GetHumanStatus;
 
@@ -40,14 +39,10 @@ class Api
         $payrexx = new \Payrexx\Payrexx($this->instance, $this->apiKey);
 
         $gateway = new \Payrexx\Models\Request\Gateway();
-        $transactionExtender = [];
-        if ($model->offsetExists('transaction_extender')) {
-            $transactionExtender = $model['transaction_extender'];
-        }
 
-        $gateway->setCurrency($transactionExtender['currency']);
+        $gateway->setCurrency($model['currency_code']);
         $gateway->setVatRate(7.70);
-        $gateway->setAmount($transactionExtender['amount']);
+        $gateway->setAmount($model['amount']);
         $gateway->setSuccessRedirectUrl($returnUrl);
         $gateway->addField($type = 'title', $value = 'mister');
         $gateway->addField($type = 'forename', $value = 'Max');
@@ -59,11 +54,11 @@ class Api
         $gateway->addField($type = 'country', $value = 'AT');
         $gateway->addField($type = 'phone', $value = '+43123456789');
         $gateway->addField($type = 'email', $value = 'max.muster@payrexx.com');
-        $gateway->addField($type = 'custom_field_1', $value = $tokenHash, $name = array(
-            1 => 'Zahlungs Token (DE)',
-            2 => 'Payment Token (EN)',
-            3 => 'Token (FR)',
-            4 => 'Token (IT)',
+        $gateway->addField($type = 'custom_field_1', $value = $model['order_id'], $name = array(
+            1 => 'Bestellung ID (DE)',
+            2 => 'Order ID (EN)',
+            3 => 'Commande ID (FR)',
+            4 => 'Ordine ID (IT)',
         ));
 
         $response = $payrexx->create($gateway);
@@ -77,11 +72,9 @@ class Api
             return null;
         }
         $invoices = $payrexxGateway->getInvoices();
-
         if (!$invoices || !$invoice = end($invoices)) {
             return null;
         }
-
         if (!$transactions = $invoice['transactions']) {
             return null;
         }
@@ -118,48 +111,6 @@ class Api
     public function getApi(): Payrexx
     {
         return $this->api;
-    }
-
-    public function createTransactionInfo(Transaction $transaction): array
-    {
-        $data = [];
-
-        $ref = new \ReflectionClass($transaction);
-
-        $invalidNames = [
-            'getters'
-        ];
-
-        foreach ($ref->getMethods() as $method) {
-
-            $methodName = $method->getName();
-
-            if (!$method->isPublic()) {
-                continue;
-            }
-
-            if (in_array($methodName, $invalidNames, true)) {
-                continue;
-            }
-
-            if (!str_starts_with($methodName, 'get')) {
-                continue;
-            }
-
-            $value = $transaction->$methodName();
-
-            if ($value === null) {
-                continue;
-            }
-
-            if (is_object($value)) {
-                continue;
-            }
-
-            $data[str_replace('get', '', $methodName)] = $value;
-        }
-
-        return $data;
     }
 
     /**

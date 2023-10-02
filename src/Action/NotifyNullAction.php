@@ -1,10 +1,24 @@
 <?php
 
+/**
+ * @author Miguel Gomes
+ *
+ * w-vision.
+ *
+ * LICENSE
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that is distributed with this source code.
+ *
+ * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
+ */
+
 declare(strict_types=1);
 
 namespace Wvision\Payum\Payrexx\Action;
 
 use Payrexx\Models\Request\Transaction;
+use Payum\Core\Request\Notify;
 use Wvision\Payum\Payrexx\Api;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
@@ -16,7 +30,6 @@ use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\Base;
 use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\GetHttpRequest;
-use Wvision\Payum\Payrexx\Request\Notify;
 
 class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
@@ -28,17 +41,6 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
         $this->apiClass = Api::class;
     }
 
-    private function wh_log($log_msg)
-    {
-        $log_filename = $_SERVER['DOCUMENT_ROOT'] . "/log_test";
-        if (!file_exists($log_filename)) {
-            // create directory/folder uploads.
-            mkdir($log_filename, 0777, true);
-        }
-        $log_file_data = $log_filename . '/log_' . date('d-M-Y:h:i:s') . '.log';
-        file_put_contents($log_file_data, $log_msg . "\n", FILE_APPEND);
-    }
-
     /**
      * @inheritDoc
      *
@@ -47,7 +49,6 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
     public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
-
         $this->gateway->execute($httpRequest = new GetHttpRequest());
 
         try {
@@ -58,23 +59,22 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
             }
 
             $transaction = new \Payrexx\Models\Request\Transaction();
-
             $id = $parsedBody['transaction']['id'];
             $transaction->setId($id);
+
             try {
                 $transaction = $this->api->getApi()->getOne($transaction);
             } catch (\Payrexx\PayrexxException $e) {
-                $this->wh_log($e->getMessage().' @Line1 ->'.$e->getLine());
+                return;
             }
 
             if (!$transaction instanceof Transaction) {
                 return;
             }
+
             $tokenHash = $parsedBody['transaction']['invoice']['paymentLink']['hash'] ?? null;
 
         } catch (\Throwable $e) {
-            $this->wh_log($e->getMessage().' @Line2 ->'.$e->getLine());
-
             throw new HttpResponse($e->getMessage(), 500, ['Content-Type' => 'text/plain', 'X-Notify-Message' => $e->getMessage()]);
         }
 
@@ -83,13 +83,11 @@ class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwa
         }
 
         try {
-            $this->gateway->execute(new Notify($tokenHash, $transaction));
+            $this->gateway->execute(new Notify($tokenHash));
         } catch (Base $e) {
-            $this->wh_log('End Notify Null '.$e->getMessage().' @Line - '.$e->getLine());
-//            throw $e;
+            throw $e;
         } catch (LogicException $e) {
-            $this->wh_log('End Notify Null '.$e->getMessage().' @Line - '.$e->getLine());
-//            throw new HttpResponse($e->getMessage(), 400, ['Content-Type' => 'text/plain']);
+            throw new HttpResponse($e->getMessage(), 400, ['Content-Type' => 'text/plain']);
         }
     }
 
