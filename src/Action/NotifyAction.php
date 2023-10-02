@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace Wvision\Payum\Payrexx\Action;
 
 use Payum\Core\Action\ActionInterface;
-use Payum\Core\Exception\LogicException;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
-use Payum\Core\Reply\Base;
-use Payum\Core\Reply\HttpResponse;
-use Payum\Core\Request\Notify;
-use Payum\Core\Request\Sync;
+use Wvision\Payum\Payrexx\Request\GetHumanStatus;
+use Wvision\Payum\Payrexx\Request\Notify;
 
 class NotifyAction implements ActionInterface, GatewayAwareInterface
 {
@@ -39,17 +36,7 @@ class NotifyAction implements ActionInterface, GatewayAwareInterface
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        try {
-            $this->gateway->execute(new Sync($request->getModel()));
-       } catch (Base $e) {
-           $this->wh_log('End Notify2 Null '.$e->getMessage().' @Line - '.$e->getLine());
-            throw $e;
-      } catch (LogicException $e) {
-          $this->wh_log('End Notify2 Null '.$e->getMessage().' @Line - '.$e->getLine());
-            throw new HttpResponse($e->getMessage(), 400, ['Content-Type' => 'text/plain']);
-       }
-
-       throw new HttpResponse('OK', 200, ['Content-Type' => 'text/plain']);
+        $this->gateway->execute(new GetHumanStatus($request->getModel(), $request->getTransaction()));
     }
 
     /**
@@ -57,7 +44,7 @@ class NotifyAction implements ActionInterface, GatewayAwareInterface
      */
     public function supports($request): bool
     {
-        $this->wh_log('notify action2 - ' .get_class($request));
+        $this->wh_log('notify action2 - ' . get_class($request));
 
         return $request instanceof Notify;
     }

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Wvision\Payum\Payrexx\Request;
 
-use Payum\Core\Request\GetHumanStatus as BaseGetHumanStatus;
+use Payum\Core\Request\Generic;
 
-class GetHumanStatus extends BaseGetHumanStatus
+class Notify extends Generic
 {
     public $transaction;
-    public const STATUS_CONFIRMED = 'confirmed';
-    public const STATUS_WAITING = 'waiting';
 
     public function __construct($model, $transaction)
     {
@@ -33,19 +31,5 @@ class GetHumanStatus extends BaseGetHumanStatus
     {
         $this->transaction = $transaction;
     }
-
-    public function markConfirmed(): void
-    {
-        $this->status = static::STATUS_CONFIRMED;
-    }
-
-    public function markWaiting(): void
-    {
-        $this->status = static::STATUS_WAITING;
-    }
-
-    public function isWaiting(): bool
-    {
-        return $this->isCurrentStatusEqualTo(static::STATUS_WAITING);
-    }
 }
+

@@ -41,7 +41,6 @@ class PayumPayrexxGatewayFactory extends GatewayFactory
             'payum.action.notify_null'     => new NotifyNullAction(),
             'payum.action.notify'          => new NotifyAction(),
             'payum.action.convert_payment' => new ConvertPaymentAction(),
-            'payum.action.sync'            => new SyncAction(),
 
             'payum.action.api.transaction_extender'   => new TransactionExtenderAction(),
             'payum.action.api.initialize_transaction' => new CreateTransactionAction(),
