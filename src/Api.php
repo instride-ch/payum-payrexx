@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * @author Miguel Gomes
+ *
  * w-vision.
  *
  * LICENSE
@@ -10,7 +12,6 @@
  *
  * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
  */
-
 namespace Wvision\Payum\Payrexx;
 
 use Payrexx\Payrexx;
@@ -44,16 +45,16 @@ class Api
         $gateway->setVatRate(7.70);
         $gateway->setAmount($model['amount']);
         $gateway->setSuccessRedirectUrl($returnUrl);
-        $gateway->addField($type = 'title', $value = 'mister');
-        $gateway->addField($type = 'forename', $value = 'Max');
-        $gateway->addField($type = 'surname', $value = 'Mustermann');
-        $gateway->addField($type = 'company', $value = 'Max Musterfirma');
-        $gateway->addField($type = 'street', $value = 'Musterweg 1');
-        $gateway->addField($type = 'postcode', $value = '1234');
-        $gateway->addField($type = 'place', $value = 'Musterort');
-        $gateway->addField($type = 'country', $value = 'AT');
-        $gateway->addField($type = 'phone', $value = '+43123456789');
-        $gateway->addField($type = 'email', $value = 'max.muster@payrexx.com');
+        $gateway->addField($type = 'title', $value = $model['title']);
+        $gateway->addField($type = 'forename', $value = $model['forename']);
+        $gateway->addField($type = 'surname', $value = $model['surname']);
+        $gateway->addField($type = 'company', $value = $model['company']);
+        $gateway->addField($type = 'street', $value = $model['street']);
+        $gateway->addField($type = 'postcode', $value = $model['postcode']);
+        $gateway->addField($type = 'place', $value = $model['place']);
+        $gateway->addField($type = 'country', $value = $model['country']);
+        $gateway->addField($type = 'phone', $value = $model['phone']);
+        $gateway->addField($type = 'email', $value = $model['email']);
         $gateway->addField($type = 'custom_field_1', $value = $model['order_id'], $name = array(
             1 => 'Bestellung ID (DE)',
             2 => 'Order ID (EN)',

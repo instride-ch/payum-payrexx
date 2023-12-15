@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * @author Miguel Gomes
+ *
  * w-vision.
  *
  * LICENSE
