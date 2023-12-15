@@ -13,8 +13,6 @@
  * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
  */
 
-
-
 declare(strict_types=1);
 
 namespace Wvision\Payum\Payrexx\Request;

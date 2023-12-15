@@ -32,7 +32,23 @@ class ConvertPaymentAction implements ActionInterface
         /** @var PaymentInterface $payment */
         $payment = $request->getSource();
         $details = ArrayObject::ensureArrayObject($payment->getDetails());
+        $order = $payment->getOrder();
+        $customer = $order->getCustomer();
         $details['order_id'] = $payment->getNumber();
+        $details['title'] = $customer->getSalutation();
+        $details['forename'] = $customer->getFirstname();
+        $details['surname'] = $customer->getLastname();
+        $details['company'] = $customer->getCompany();
+        $address = $customer->getDefaultAddress();
+        if ($address) {
+            $details['street'] = $address->getCompany() . ' ' . $address->getNumber();
+            $details['postcode'] = $address->getPostcode();
+            $details['place'] = $address->getCity();
+            $details['country'] = $address->getCountry()->getIsoCode();
+        }
+
+        $details['phone'] = $customer->getPhone();
+        $details['email'] = $customer->getEmail();
         $details['currency_code'] = $payment->getCurrencyCode();
         $details['amount'] = $payment->getTotalAmount();
         $details['description'] = $payment->getDescription();
