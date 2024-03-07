@@ -1,5 +1,5 @@
 {
-  "name": "w-vision/payum-payrexx",
+  "name": "instride/payum-payrexx",
   "type": "library",
   "description": "A Payum extension to provide Payrexx payment integration.",
   "keywords": [
@@ -10,10 +10,10 @@
   "license": "GPL-3.0-or-later",
   "authors": [
     {
-      "name": "w-vision AG",
-      "email": "support@w-vision.ch",
-      "homepage": "https://w-vision.ch",
-      "role": "Web Development Agency"
+      "name": "instride AG",
+      "email": "connect@instride.ch",
+      "homepage": "https://instride.ch",
+      "role": "Digital Agency"
     }
   ],
   "require": {
@@ -24,7 +24,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Wvision\\Payum\\Payrexx\\": "src/"
+      "Instride\\Payum\\Payrexx\\": "src/"
     }
   },
   "extra": {

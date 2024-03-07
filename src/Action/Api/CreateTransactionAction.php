@@ -3,20 +3,20 @@
 /**
  * @author Miguel Gomes
  *
- * w-vision.
+ * instride AG
  *
  * LICENSE
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that is distributed with this source code.
  *
- * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
+ * @copyright 2024 instride AG (https://instride.ch)
  */
 
 
 declare(strict_types=1);
 
-namespace Wvision\Payum\Payrexx\Action\Api;
+namespace Instride\Payum\Payrexx\Action\Api;
 
 use Payrexx\Models\Request\Transaction;
 use Payum\Core\Action\ActionInterface;
@@ -24,8 +24,8 @@ use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
-use Wvision\Payum\Payrexx\Api;
-use Wvision\Payum\Payrexx\Request\Api\CreateTransaction;
+use Instride\Payum\Payrexx\Api;
+use Instride\Payum\Payrexx\Request\Api\CreateTransaction;
 
 class CreateTransactionAction implements ActionInterface, ApiAwareInterface
 {

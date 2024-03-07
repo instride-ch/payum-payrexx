@@ -4,7 +4,6 @@ payment integration.
 
 ## Installation
 
-#### Via Composer
 ```bash
-$ composer require w-vision/payum-payrexx:^1.0
+$ composer require instride/payum-payrexx:^1.0
 ```

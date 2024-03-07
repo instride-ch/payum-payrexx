@@ -3,19 +3,19 @@
 /**
  * @author Miguel Gomes
  *
- * w-vision.
+ * instride AG
  *
  * LICENSE
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that is distributed with this source code.
  *
- * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
+ * @copyright 2024 instride AG (https://instride.ch)
  */
 
 declare(strict_types=1);
 
-namespace Wvision\Payum\Payrexx\Request;
+namespace Instride\Payum\Payrexx\Request;
 
 use Payum\Core\Request\GetHumanStatus as BaseGetHumanStatus;
 

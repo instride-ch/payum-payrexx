@@ -3,19 +3,19 @@
 /**
  * @author Miguel Gomes
  *
- * w-vision.
+ * instride AG
  *
  * LICENSE
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that is distributed with this source code.
  *
- * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
+ * @copyright 2024 instride AG (https://instride.ch)
  */
 
 declare(strict_types=1);
 
-namespace Wvision\Payum\Payrexx\Action;
+namespace Instride\Payum\Payrexx\Action;
 
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
@@ -24,8 +24,8 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Capture;
 use Payum\Core\Request\GetHttpRequest;
-use Wvision\Payum\Payrexx\Request\Api\CaptureOffsite;
-use Wvision\Payum\Payrexx\Request\Api\CreateTransaction;
+use Instride\Payum\Payrexx\Request\Api\CaptureOffsite;
+use Instride\Payum\Payrexx\Request\Api\CreateTransaction;
 
 class CaptureAction implements ActionInterface, GatewayAwareInterface
 {

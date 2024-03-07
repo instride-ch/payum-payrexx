@@ -3,30 +3,30 @@
 /**
  * @author Miguel Gomes
  *
- * w-vision.
+ * instride AG
  *
  * LICENSE
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that is distributed with this source code.
  *
- * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
+ * @copyright 2024 instride AG (https://instride.ch)
  */
 
 declare(strict_types=1);
 
-namespace Wvision\Payum\Payrexx;
+namespace Instride\Payum\Payrexx;
 
 use Payrexx\Payrexx;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\GatewayFactory;
-use Wvision\Payum\Payrexx\Action\Api\CaptureOffsiteAction;
-use Wvision\Payum\Payrexx\Action\Api\CreateTransactionAction;
-use Wvision\Payum\Payrexx\Action\CaptureAction;
-use Wvision\Payum\Payrexx\Action\ConvertPaymentAction;
-use Wvision\Payum\Payrexx\Action\NotifyAction;
-use Wvision\Payum\Payrexx\Action\NotifyNullAction;
-use Wvision\Payum\Payrexx\Action\StatusAction;
+use Instride\Payum\Payrexx\Action\Api\CaptureOffsiteAction;
+use Instride\Payum\Payrexx\Action\Api\CreateTransactionAction;
+use Instride\Payum\Payrexx\Action\CaptureAction;
+use Instride\Payum\Payrexx\Action\ConvertPaymentAction;
+use Instride\Payum\Payrexx\Action\NotifyAction;
+use Instride\Payum\Payrexx\Action\NotifyNullAction;
+use Instride\Payum\Payrexx\Action\StatusAction;
 
 class PayumPayrexxGatewayFactory extends GatewayFactory
 {

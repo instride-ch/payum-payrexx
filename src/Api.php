@@ -3,20 +3,20 @@
 /**
  * @author Miguel Gomes
  *
- * w-vision.
+ * instride AG
  *
  * LICENSE
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that is distributed with this source code.
  *
- * @copyright  Copyright (c) 2019 w-vision AG (https://www.w-vision.ch)
+ * @copyright 2024 instride AG (https://instride.ch)
  */
-namespace Wvision\Payum\Payrexx;
+namespace Instride\Payum\Payrexx;
 
 use Payrexx\Payrexx;
-use Wvision\Payum\Payrexx\Request\Api\CreateTransaction;
-use Wvision\Payum\Payrexx\Request\GetHumanStatus;
+use Instride\Payum\Payrexx\Request\Api\CreateTransaction;
+use Instride\Payum\Payrexx\Request\GetHumanStatus;
 
 class Api
 {
