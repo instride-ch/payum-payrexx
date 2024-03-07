@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * @author Miguel Gomes
- *
  * instride AG
  *
  * LICENSE
@@ -13,18 +13,16 @@
  * @copyright 2024 instride AG (https://instride.ch)
  */
 
-declare(strict_types=1);
-
 namespace Instride\Payum\Payrexx\Action;
 
+use Instride\Payum\Payrexx\Api;
+use Instride\Payum\Payrexx\Request\GetHumanStatus;
 use Payrexx\Models\Request\Transaction;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Request\GetStatusInterface;
-use Instride\Payum\Payrexx\Api;
-use Instride\Payum\Payrexx\Request\GetHumanStatus;
 
 class StatusAction implements ActionInterface, ApiAwareInterface
 {
@@ -43,14 +41,15 @@ class StatusAction implements ActionInterface, ApiAwareInterface
         RequestNotSupportedException::assertSupports($this, $request);
         $model = $request->getModel();
 
-
-        if (array_key_exists('gateway_id', $model)) {
+        if (\array_key_exists('gateway_id', $model)) {
             if ($model['gateway_id'] === null) {
                 $request->markNew();
+
                 return;
             }
         } else {
             $request->markNew();
+
             return;
         }
 
@@ -59,6 +58,7 @@ class StatusAction implements ActionInterface, ApiAwareInterface
 
         if (!$transaction instanceof Transaction) {
             $request->markUnknown();
+
             return;
         }
 

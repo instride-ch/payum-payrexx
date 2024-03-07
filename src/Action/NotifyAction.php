@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * @author Miguel Gomes
- *
  * instride AG
  *
  * LICENSE
@@ -13,16 +13,14 @@
  * @copyright 2024 instride AG (https://instride.ch)
  */
 
-declare(strict_types=1);
-
 namespace Instride\Payum\Payrexx\Action;
 
+use Instride\Payum\Payrexx\Request\GetHumanStatus;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Notify;
-use Instride\Payum\Payrexx\Request\GetHumanStatus;
 
 class NotifyAction implements ActionInterface, GatewayAwareInterface
 {

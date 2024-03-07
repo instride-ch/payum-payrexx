@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * @author Miguel Gomes
- *
  * instride AG
  *
  * LICENSE
@@ -13,10 +13,10 @@
  * @copyright 2024 instride AG (https://instride.ch)
  */
 
-declare(strict_types=1);
-
 namespace Instride\Payum\Payrexx\Action;
 
+use Instride\Payum\Payrexx\Request\Api\CaptureOffsite;
+use Instride\Payum\Payrexx\Request\Api\CreateTransaction;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
@@ -24,8 +24,6 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Capture;
 use Payum\Core\Request\GetHttpRequest;
-use Instride\Payum\Payrexx\Request\Api\CaptureOffsite;
-use Instride\Payum\Payrexx\Request\Api\CreateTransaction;
 
 class CaptureAction implements ActionInterface, GatewayAwareInterface
 {
@@ -42,8 +40,9 @@ class CaptureAction implements ActionInterface, GatewayAwareInterface
 
         $this->gateway->execute($httpRequest = new GetHttpRequest());
 
-        if (array_key_exists('redirect_status', $httpRequest->query)) {
+        if (\array_key_exists('redirect_status', $httpRequest->query)) {
             $model->replace($httpRequest->query);
+
             return;
         }
 

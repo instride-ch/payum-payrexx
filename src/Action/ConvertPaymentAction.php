@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * @author Miguel Gomes
- *
  * instride AG
  *
  * LICENSE
@@ -12,8 +12,6 @@
  *
  * @copyright 2024 instride AG (https://instride.ch)
  */
-
-declare(strict_types=1);
 
 namespace Instride\Payum\Payrexx\Action;
 
@@ -40,6 +38,7 @@ class ConvertPaymentAction implements ActionInterface
         $details['surname'] = $customer->getLastname();
         $details['company'] = $customer->getCompany();
         $address = $customer->getDefaultAddress();
+
         if ($address) {
             $details['street'] = $address->getCompany() . ' ' . $address->getNumber();
             $details['postcode'] = $address->getPostcode();
@@ -53,13 +52,12 @@ class ConvertPaymentAction implements ActionInterface
         $details['amount'] = $payment->getTotalAmount();
         $details['description'] = $payment->getDescription();
 
-        $request->setResult((array)$details);
+        $request->setResult((array) $details);
     }
 
     public function supports($request): bool
     {
-        return
-            $request instanceof Convert &&
-            $request->getSource() instanceof PaymentInterface;
+        return $request instanceof Convert
+            && $request->getSource() instanceof PaymentInterface;
     }
 }

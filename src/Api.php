@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * @author Miguel Gomes
- *
  * instride AG
  *
  * LICENSE
@@ -12,11 +12,18 @@
  *
  * @copyright 2024 instride AG (https://instride.ch)
  */
+
 namespace Instride\Payum\Payrexx;
 
-use Payrexx\Payrexx;
 use Instride\Payum\Payrexx\Request\Api\CreateTransaction;
 use Instride\Payum\Payrexx\Request\GetHumanStatus;
+use Payrexx\Models\Base;
+use Payrexx\Models\Request\Gateway as RequestGateway;
+use Payrexx\Models\Request\Transaction as RequestTransaction;
+use Payrexx\Models\Response\Gateway as ResponseGateway;
+use Payrexx\Models\Response\Transaction as ResponseTransaction;
+use Payrexx\Payrexx;
+use Payrexx\PayrexxException;
 
 class Api
 {
@@ -25,22 +32,19 @@ class Api
     private Payrexx $api;
     private string $afterLink;
 
-    public function __construct(Payrexx $api,
-                                string  $instance,
-                                string  $apiKey)
+    public function __construct(Payrexx $api, string $instance, string $apiKey)
     {
         $this->api = $api;
         $this->apiKey = $apiKey;
         $this->instance = $instance;
     }
 
-    public function createTransaction(CreateTransaction $request, string $returnUrl, string $tokenHash): \Payrexx\Models\Base
+    public function createTransaction(CreateTransaction $request, string $returnUrl, string $tokenHash): Base
     {
         $model = $request->getFirstModel();
-        $payrexx = new \Payrexx\Payrexx($this->instance, $this->apiKey);
+        $payrexx = new Payrexx($this->instance, $this->apiKey);
 
-        $gateway = new \Payrexx\Models\Request\Gateway();
-
+        $gateway = new RequestGateway();
         $gateway->setCurrency($model['currency_code']);
         $gateway->setVatRate(7.70);
         $gateway->setAmount($model['amount']);
@@ -67,44 +71,45 @@ class Api
         return $response;
     }
 
-    public function getTransactionByGateway($payrexxGateway): ?\Payrexx\Models\Response\Transaction
+    public function getTransactionByGateway($payrexxGateway): ?ResponseTransaction
     {
-        if (!in_array($payrexxGateway->getStatus(), [GetHumanStatus::STATUS_CONFIRMED, GetHumanStatus::STATUS_WAITING])) {
+        if (!\in_array($payrexxGateway->getStatus(), [GetHumanStatus::STATUS_CONFIRMED, GetHumanStatus::STATUS_WAITING])) {
             return null;
         }
+
         $invoices = $payrexxGateway->getInvoices();
-        if (!$invoices || !$invoice = end($invoices)) {
+
+        if (!$invoices || !$invoice = \end($invoices)) {
             return null;
         }
+
         if (!$transactions = $invoice['transactions']) {
             return null;
         }
 
-        return $this->getPayrexxTransaction(end($transactions)['id']);
+        return $this->getPayrexxTransaction(\end($transactions)['id']);
     }
 
-    public function getPayrexxTransaction(int $payrexxTransactionId): ?\Payrexx\Models\Response\Transaction
+    public function getPayrexxTransaction(int $payrexxTransactionId): ?ResponseTransaction
     {
-        $payrexxTransaction = new \Payrexx\Models\Request\Transaction();
+        $payrexxTransaction = new RequestTransaction();
         $payrexxTransaction->setId($payrexxTransactionId);
 
         try {
-            $response = $this->getApi()->getOne($payrexxTransaction);
-            return $response;
-        } catch(\Payrexx\PayrexxException $e) {
+            return $this->getApi()->getOne($payrexxTransaction);
+        } catch(PayrexxException $e) {
             return null;
         }
     }
 
-    public function getPayrexxGateway(int $payrexxGatewayId): ?\Payrexx\Models\Response\Gateway
+    public function getPayrexxGateway(int $payrexxGatewayId): ?ResponseGateway
     {
-        $payrexxGateway = new \Payrexx\Models\Request\Gateway();
+        $payrexxGateway = new RequestGateway();
         $payrexxGateway->setId($payrexxGatewayId);
 
         try {
-            $response = $this->getApi()->getOne($payrexxGateway);
-            return $response;
-        } catch(\Payrexx\PayrexxException $e) {
+            return $this->getApi()->getOne($payrexxGateway);
+        } catch(PayrexxException $e) {
             return null;
         }
     }

@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * @author Miguel Gomes
- *
  * instride AG
  *
  * LICENSE
@@ -12,8 +12,6 @@
  *
  * @copyright 2024 instride AG (https://instride.ch)
  */
-
-declare(strict_types=1);
 
 namespace Instride\Payum\Payrexx\Request\Api;
 
