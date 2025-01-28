@@ -41,13 +41,7 @@ class StatusAction implements ActionInterface, ApiAwareInterface
         RequestNotSupportedException::assertSupports($this, $request);
         $model = $request->getModel();
 
-        if (\array_key_exists('gateway_id', $model)) {
-            if ($model['gateway_id'] === null) {
-                $request->markNew();
-
-                return;
-            }
-        } else {
+        if (! isset($model['gateway_id'])) {
             $request->markNew();
 
             return;
