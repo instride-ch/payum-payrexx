@@ -31,12 +31,19 @@ class Api
     private string $apiKey;
     private Payrexx $api;
     private string $afterLink;
+    private array $paymentMethods;
 
-    public function __construct(Payrexx $api, string $instance, string $apiKey)
+    public function __construct(
+        Payrexx $api,
+        string $instance,
+        string $apiKey,
+        array $paymentMethods
+    )
     {
         $this->api = $api;
         $this->apiKey = $apiKey;
         $this->instance = $instance;
+        $this->paymentMethods = $paymentMethods;
     }
 
     public function createTransaction(CreateTransaction $request, string $returnUrl, string $tokenHash): Base
@@ -49,6 +56,11 @@ class Api
         $gateway->setVatRate(7.70);
         $gateway->setAmount($model['amount']);
         $gateway->setSuccessRedirectUrl($returnUrl);
+
+        if ($this->paymentMethods) {
+            $gateway->setPm($this->paymentMethods);
+        }
+
         $gateway->addField($type = 'title', $value = $model['title']);
         $gateway->addField($type = 'forename', $value = $model['forename']);
         $gateway->addField($type = 'surname', $value = $model['surname']);
