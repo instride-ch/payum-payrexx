@@ -45,6 +45,7 @@ class PayumPayrexxGatewayFactory extends GatewayFactory
         $config['payum.default_options'] = [
             'instance' => '',
             'api_key' => '',
+            'payment_methods' => [],
         ];
 
         $config->defaults($config['payum.default_options']);
@@ -56,7 +57,8 @@ class PayumPayrexxGatewayFactory extends GatewayFactory
             return new Api(
                 new Payrexx($config['instance'], $config['api_key']),
                 $config['instance'],
-                $config['api_key']
+                $config['api_key'],
+                $config['payment_methods'],
             );
         };
     }
