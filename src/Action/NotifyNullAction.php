@@ -10,7 +10,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE.md
  * file that is distributed with this source code.
  *
- * @copyright 2024 instride AG (https://instride.ch)
+ * @copyright 2026 instride AG (https://instride.ch)
  */
 
 namespace Instride\Payum\Payrexx\Action;
@@ -18,7 +18,6 @@ namespace Instride\Payum\Payrexx\Action;
 use Instride\Payum\Payrexx\Api;
 use Payrexx\Models\Request\Transaction;
 use Payrexx\PayrexxException;
-use Payum\Core\Request\Notify;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
@@ -29,6 +28,7 @@ use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\Base;
 use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\GetHttpRequest;
+use Payum\Core\Request\Notify;
 
 class NotifyNullAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
